@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+#[derive(Component)]
+pub struct Marker;
+
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera3dBundle::default());
 
@@ -14,23 +17,25 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         })
         .with_children(|parent| {
-            parent.spawn(
-                TextBundle::from_section(
-                    "Text",
-                    TextStyle {
-                        font,
-                        font_size: 50.,
+            parent
+                .spawn(
+                    TextBundle::from_section(
+                        "Text",
+                        TextStyle {
+                            font,
+                            font_size: 50.,
+                            ..default()
+                        },
+                    )
+                    .with_style(Style {
+                        position: UiRect {
+                            left: Val::Percent(10.),
+                            ..default()
+                        },
                         ..default()
-                    },
+                    }),
                 )
-                .with_style(Style {
-                    position: UiRect {
-                        left: Val::Percent(10.),
-                        ..default()
-                    },
-                    ..default()
-                }),
-            );
+                .insert(Marker);
         });
 }
 
