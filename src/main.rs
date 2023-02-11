@@ -7,6 +7,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn(NodeBundle {
             style: Style {
+                size: Size::new(Val::Percent(100.), Val::Percent(100.)),
                 align_items: AlignItems::Center,
                 ..default()
             },
