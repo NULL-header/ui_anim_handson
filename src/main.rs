@@ -39,9 +39,17 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
+fn animate(mut query: Query<&mut Transform, With<Marker>>) {
+    let mut transform = query.single_mut();
+    let x = transform.translation.x;
+    let x = x + 1.;
+    transform.translation.x = x;
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
+        .add_system(animate)
         .run();
 }
