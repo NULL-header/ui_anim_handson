@@ -39,11 +39,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-fn animate(mut query: Query<&mut Style, With<Marker>>) {
+fn animate(mut query: Query<&mut Style, With<Marker>>, time: Res<Time>) {
     let mut style = query.single_mut();
     let position = &mut style.position;
     let left = match position.left {
-        Val::Percent(percent) => Val::Percent(percent + 0.5),
+        Val::Percent(percent) => Val::Percent(percent + 25. * time.delta_seconds()),
         _ => {
             return;
         }
