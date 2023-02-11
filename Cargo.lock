@@ -2878,6 +2878,7 @@ name = "ui_anim_handson"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "thiserror",
 ]
 
 [[package]]
