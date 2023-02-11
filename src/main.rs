@@ -40,18 +40,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-// match position.left {
-//   Val::Percent(percent) => {
-//       if percent > 50. {
-//           return;
-//       }
-//       Val::Percent(percent + 25. * time.delta_seconds())
-//   }
-//   _ => {
-//       return;
-//   }
-// }
-
 #[derive(Error, Debug)]
 enum NextValError {
     #[error("The animation has finished.")]
