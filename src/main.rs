@@ -39,11 +39,16 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         });
 }
 
-fn animate(mut query: Query<&mut Transform, With<Marker>>) {
-    let mut transform = query.single_mut();
-    let x = transform.translation.x;
-    let x = x + 1.;
-    transform.translation.x = x;
+fn animate(mut query: Query<&mut Style, With<Marker>>) {
+    let mut style = query.single_mut();
+    let position = &mut style.position;
+    let left = match position.left {
+        Val::Percent(percent) => Val::Percent(percent + 0.5),
+        _ => {
+            return;
+        }
+    };
+    position.left = left;
 }
 
 fn main() {
