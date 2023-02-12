@@ -4,6 +4,13 @@ use thiserror::Error;
 #[derive(Component)]
 struct Marker;
 
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+enum AnimateState {
+    NotStarted,
+    Animating,
+    Finished,
+}
+
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera3dBundle::default());
 
@@ -59,13 +66,21 @@ fn next_percent(current: Val, delta: f32) -> Result<Val, NextValError> {
     Ok(Val::Percent(current + 25. * delta))
 }
 
-fn animate(mut query: Query<&mut Style, With<Marker>>, time: Res<Time>) {
+fn animate(
+    mut query: Query<&mut Style, With<Marker>>,
+    time: Res<Time>,
+    mut state: ResMut<State<AnimateState>>,
+) {
     let mut style = query.single_mut();
     let position = &mut style.position;
     let left = next_percent(position.left, time.delta_seconds());
     let left = match left {
         Ok(l) => l,
         _ => {
+            if *state.current() != AnimateState::Finished {
+                return;
+            }
+            state.set(AnimateState::Finished).unwrap();
             return;
         }
     };
@@ -76,6 +91,8 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
+        .add_state(AnimateState::Animating)
+        .add_system_set(SystemSet::on_update(AnimateState::Animating).with_system(animate))
         .add_system(animate)
         .run();
 }
