@@ -1,5 +1,5 @@
+mod percent;
 use bevy::prelude::*;
-use thiserror::Error;
 
 #[derive(Component)]
 pub struct Marker;
@@ -7,27 +7,9 @@ pub struct Marker;
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AnimateState {
     NotStarted,
+    Setup,
     Animating,
     Finished,
-}
-
-#[derive(Error, Debug)]
-enum NextValError {
-    #[error("The animation has finished.")]
-    Finished,
-    #[error("The current value is not supported. Maybe init is wrong.")]
-    NotPercent,
-}
-
-fn next_percent(current: Val, delta: f32) -> Result<Val, NextValError> {
-    let current = match current {
-        Val::Percent(p) => p,
-        _ => return Err(NextValError::NotPercent),
-    };
-    if current >= 50. {
-        return Err(NextValError::Finished);
-    }
-    Ok(Val::Percent(current + 25. * delta))
 }
 
 fn animate(
@@ -37,15 +19,31 @@ fn animate(
 ) {
     let mut style = query.single_mut();
     let position = &mut style.position;
-    let left = next_percent(position.left, time.delta_seconds());
+    let mut left = percent::Percent::new(position.left);
+    let left = left.add(25. * time.delta_seconds()).round();
+    if left.should_finish() {
+        state.set(AnimateState::Finished).unwrap();
+    }
+    position.left = left.get();
+}
+
+fn setup(
+    mut query: Query<&mut Style, With<Marker>>,
+    windows: Res<Windows>,
+    mut state: ResMut<State<AnimateState>>,
+) {
+    let position = &mut query.single_mut().position;
+    let left = position.left;
     let left = match left {
-        Ok(l) => l,
-        _ => {
-            state.set(AnimateState::Finished).unwrap();
-            return;
+        Val::Percent(percent) => Val::Percent(percent),
+        Val::Px(px) => {
+            let width_window = windows.get_primary().unwrap().width();
+            Val::Percent(px / width_window * 100.)
         }
+        _ => Val::Percent(10.),
     };
     position.left = left;
+    state.overwrite_set(AnimateState::Animating).unwrap();
 }
 
 pub struct SlidePlugin;
@@ -53,6 +51,11 @@ pub struct SlidePlugin;
 impl Plugin for SlidePlugin {
     fn build(&self, app: &mut App) {
         app.add_state(AnimateState::NotStarted)
+            .add_system_set(SystemSet::on_enter(AnimateState::Setup).with_system(setup))
             .add_system_set(SystemSet::on_update(AnimateState::Animating).with_system(animate));
     }
+}
+
+pub fn fire_animate_system(mut state: ResMut<State<AnimateState>>) {
+    state.overwrite_set(AnimateState::Setup).unwrap();
 }
