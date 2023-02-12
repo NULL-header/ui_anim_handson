@@ -77,9 +77,6 @@ fn animate(
     let left = match left {
         Ok(l) => l,
         _ => {
-            if *state.current() != AnimateState::Finished {
-                return;
-            }
             state.set(AnimateState::Finished).unwrap();
             return;
         }
@@ -93,6 +90,5 @@ fn main() {
         .add_startup_system(setup)
         .add_state(AnimateState::Animating)
         .add_system_set(SystemSet::on_update(AnimateState::Animating).with_system(animate))
-        .add_system(animate)
         .run();
 }
