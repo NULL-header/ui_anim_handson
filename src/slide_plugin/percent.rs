@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 use bevy::prelude::*;
 
 const MAX: f32 = 50.;
