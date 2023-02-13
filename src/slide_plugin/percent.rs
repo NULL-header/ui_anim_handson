@@ -44,7 +44,6 @@ impl Percent {
     pub fn add(&mut self, percent: f32) -> &Self {
         self.value += percent;
         self
-        // self.value + Val::Percent(percent);
     }
     pub fn round(&self) -> PercentRound {
         PercentRound::new(self.value)
