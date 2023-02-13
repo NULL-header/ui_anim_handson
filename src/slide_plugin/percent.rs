@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 const MAX: f32 = 50.;
 
+#[derive(Debug)]
 pub struct PercentRound {
     value: f32,
     should_finish: bool,
@@ -28,6 +29,7 @@ impl PercentRound {
     }
 }
 
+#[derive(Debug)]
 pub struct Percent {
     value: f32,
 }
